@@ -144,5 +144,5 @@ def forward(q, k, v, q_scale, k_scale, tensor_layout="HND", output_dtype=torch.f
         BLOCK_M=BLOCK_M, BLOCK_N=BLOCK_N, HEAD_DIM=HEAD_DIM_K,  
         STAGE=stage,  
         num_warps=4 if head_dim == 64 else 8,
-        num_stages=3)
+        num_stages=4)
     return o
