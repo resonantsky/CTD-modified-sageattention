@@ -1,6 +1,20 @@
 # CTD-modified-sageattention
 A SageAttention mod specifically for lower tier RDNA2 GPU's
 
+## Changes — Extended Autotune Parameters (April 2026)
+
+Based on profiling results across seq_len [512–8192] and head_dim [64, 128] on AMD RX 6800 (gfx1030),
+the default config space was expanded to allow larger tile sizes that win at longer sequences.
+
+### `attn_qk_int8_per_block.py` (non-causal, autotuned)
+
+- `BLOCK_M` search range: `[32]` → `[32, 64]`
+- `BLOCK_N` search range: `[16]` → `[16, 32]`
+- `keep()` area ceiling: `> 1024` → `> 2048` (admits the new 64×32 tile)
+- Removed contradictory `num_warps` rules that would have filtered every area≥2048 config
+
+Autotune will now select from 32/16, 32/32, 64/16, and 64/32 at runtime per shape.
+
 - Autotuning kernel _attn_fwd with config BLOCK_M: 32, BLOCK_N: 16, STAGE: 1, waves_per_eu: 3, num_warps: 2, num_ctas: 1, num_stages: 1, maxnreg: None
 - Autotuning kernel _attn_fwd with config BLOCK_M: 32, BLOCK_N: 16, STAGE: 1, waves_per_eu: 4, num_warps: 2, num_ctas: 1, num_stages: 1, maxnreg: None
 - Autotuning kernel _attn_fwd with config BLOCK_M: 32, BLOCK_N: 16, STAGE: 1, waves_per_eu: 3, num_warps: 4, num_ctas: 1, num_stages: 1, maxnreg: None
@@ -23,20 +37,6 @@ finished after 28.81s,
 - best config selected: BLOCK_M: 64, BLOCK_N: 16, STAGE: 1, waves_per_eu: 4, num_warps: 4, num_ctas: 1, num_stages: 1, maxnreg: None;
 
 ---
-
-## Changes — Extended Autotune Parameters (April 2026)
-
-Based on profiling results across seq_len [512–8192] and head_dim [64, 128] on AMD RX 6800 (gfx1030),
-the default config space was expanded to allow larger tile sizes that win at longer sequences.
-
-### `attn_qk_int8_per_block.py` (non-causal, autotuned)
-
-- `BLOCK_M` search range: `[32]` → `[32, 64]`
-- `BLOCK_N` search range: `[16]` → `[16, 32]`
-- `keep()` area ceiling: `> 1024` → `> 2048` (admits the new 64×32 tile)
-- Removed contradictory `num_warps` rules that would have filtered every area≥2048 config
-
-Autotune will now select from 32/16, 32/32, 64/16, and 64/32 at runtime per shape.
 
 ### `attn_qk_int8_per_block_causal.py` (causal, hardcoded)
 
