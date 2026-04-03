@@ -13,31 +13,6 @@ the default config space was expanded to allow larger tile sizes that win at lon
 - `keep()` area ceiling: `> 1024` → `> 2048` (admits the new 64×32 tile)
 - Removed contradictory `num_warps` rules that would have filtered every area≥2048 config
 
-Autotune will now select from 32/16, 32/32, 64/16, and 64/32 at runtime per shape.
-
-- Autotuning kernel _attn_fwd with config BLOCK_M: 32, BLOCK_N: 16, STAGE: 1, waves_per_eu: 3, num_warps: 2, num_ctas: 1, num_stages: 1, maxnreg: None
-- Autotuning kernel _attn_fwd with config BLOCK_M: 32, BLOCK_N: 16, STAGE: 1, waves_per_eu: 4, num_warps: 2, num_ctas: 1, num_stages: 1, maxnreg: None
-- Autotuning kernel _attn_fwd with config BLOCK_M: 32, BLOCK_N: 16, STAGE: 1, waves_per_eu: 3, num_warps: 4, num_ctas: 1, num_stages: 1, maxnreg: None
-- Autotuning kernel _attn_fwd with config BLOCK_M: 32, BLOCK_N: 16, STAGE: 1, waves_per_eu: 4, num_warps: 4, num_ctas: 1, num_stages: 1, maxnreg: None
-- Autotuning kernel _attn_fwd with config BLOCK_M: 32, BLOCK_N: 32, STAGE: 1, waves_per_eu: 3, num_warps: 2, num_ctas: 1, num_stages: 1, maxnreg: None
-- Autotuning kernel _attn_fwd with config BLOCK_M: 32, BLOCK_N: 32, STAGE: 1, waves_per_eu: 4, num_warps: 2, num_ctas: 1, num_stages: 1, maxnreg: None
-- Autotuning kernel _attn_fwd with config BLOCK_M: 32, BLOCK_N: 32, STAGE: 1, waves_per_eu: 3, num_warps: 4, num_ctas: 1, num_stages: 1, maxnreg: None
-- Autotuning kernel _attn_fwd with config BLOCK_M: 32, BLOCK_N: 32, STAGE: 1, waves_per_eu: 4, num_warps: 4, num_ctas: 1, num_stages: 1, maxnreg: None
-- Autotuning kernel _attn_fwd with config BLOCK_M: 64, BLOCK_N: 16, STAGE: 1, waves_per_eu: 3, num_warps: 2, num_ctas: 1, num_stages: 1, maxnreg: None
-- Autotuning kernel _attn_fwd with config BLOCK_M: 64, BLOCK_N: 16, STAGE: 1, waves_per_eu: 4, num_warps: 2, num_ctas: 1, num_stages: 1, maxnreg: None
-- Autotuning kernel _attn_fwd with config BLOCK_M: 64, BLOCK_N: 16, STAGE: 1, waves_per_eu: 3, num_warps: 4, num_ctas: 1, num_stages: 1, maxnreg: None
-- Autotuning kernel _attn_fwd with config BLOCK_M: 64, BLOCK_N: 16, STAGE: 1, waves_per_eu: 4, num_warps: 4, num_ctas: 1, num_stages: 1, maxnreg: None
-- Autotuning kernel _attn_fwd with config BLOCK_M: 64, BLOCK_N: 32, STAGE: 1, waves_per_eu: 3, num_warps: 2, num_ctas: 1, num_stages: 1, maxnreg: None
-- Autotuning kernel _attn_fwd with config BLOCK_M: 64, BLOCK_N: 32, STAGE: 1, waves_per_eu: 4, num_warps: 2, num_ctas: 1, num_stages: 1, maxnreg: None
-- Autotuning kernel _attn_fwd with config BLOCK_M: 64, BLOCK_N: 32, STAGE: 1, waves_per_eu: 3, num_warps: 4, num_ctas: 1, num_stages: 1, maxnreg: None
-- Autotuning kernel _attn_fwd with config BLOCK_M: 64, BLOCK_N: 32, STAGE: 1, waves_per_eu: 4, num_warps: 4, num_ctas: 1, num_stages: 1, maxnreg: None
-- Triton autotuning for function _attn_fwd,
-with key as (6656, 6656, 'torch.int8', 'torch.int8', 'torch.float16', 'torch.float32', 'torch.float32', 'torch.float16'),
-finished after 28.81s,
-- Best config selected: BLOCK_M: 64, BLOCK_N: 16, STAGE: 1, waves_per_eu: 4, num_warps: 4, num_ctas: 1, num_stages: 1, maxnreg: None;
-
----
-
 ### `attn_qk_int8_per_block_causal.py` (causal, hardcoded)
 
 - Fixed tile: `BLOCK_M 32 → 64`, `BLOCK_N` unchanged at 16
