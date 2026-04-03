@@ -8,7 +8,7 @@ configs = [
     for BM in [32]\
     for BN in [16, 32]\
     for nw in[2, 4]\
-    for ns in [1]\
+    for ns in [2, 3]\
     for S in [1]\
     for wpe in [3,4]
 ]

@@ -2,6 +2,14 @@ import torch, math
 import triton
 import triton.language as tl
 
+configs_causal = [
+    triton.Config({'BLOCK_M': 32, 'BLOCK_N': BN, 'STAGE': 3, 'waves_per_eu': wpe}, num_warps=nw, num_stages=ns)
+    for BN  in [16, 32]
+    for nw  in [2, 4]
+    for ns  in [2, 3]
+    for wpe in [3, 4]
+]
+
 @triton.jit
 def _attn_fwd_inner(acc, l_i, m_i, q, q_scale, kv_len,
                     K_ptrs, K_scale_ptr, V_ptrs, stride_kn, stride_vn, 
@@ -51,6 +59,7 @@ def _attn_fwd_inner(acc, l_i, m_i, q, q_scale, kv_len,
         V_ptrs += BLOCK_N * stride_vn
     return acc, l_i, m_i
 
+@triton.autotune(configs_causal, key=['qo_len', 'kv_len', 'H'])
 @triton.jit
 def _attn_fwd(Q, K, V, Q_scale, K_scale, Out,  
               stride_qz, stride_qh, stride_qn,
@@ -102,10 +111,6 @@ def _attn_fwd(Q, K, V, Q_scale, K_scale, Out,
     tl.store(O_block_ptr, acc.to(Out.type.element_ty), mask = (offs_m[:, None] < qo_len))
 
 def forward(q, k, v, q_scale, k_scale, tensor_layout="HND", output_dtype=torch.float16):
-    BLOCK_M = 32
-    BLOCK_N = 16
-    stage = 3
-
     o = torch.empty(q.shape, dtype=output_dtype, device=q.device)
 
     if tensor_layout == "HND":
@@ -132,7 +137,7 @@ def forward(q, k, v, q_scale, k_scale, tensor_layout="HND", output_dtype=torch.f
     HEAD_DIM_K = head_dim
     num_kv_groups = h_qo // h_kv
 
-    grid = (triton.cdiv(qo_len, BLOCK_M), h_qo, b   )
+    grid = lambda META: (triton.cdiv(qo_len, META['BLOCK_M']), h_qo, b)
     _attn_fwd[grid](
         q, k, v, q_scale, k_scale, o,  
         stride_bz_q, stride_h_q, stride_seq_q, 
@@ -141,8 +146,5 @@ def forward(q, k, v, q_scale, k_scale, tensor_layout="HND", output_dtype=torch.f
         stride_bz_o, stride_h_o, stride_seq_o,
         qo_len, kv_len,
         h_qo, num_kv_groups,
-        BLOCK_M=BLOCK_M, BLOCK_N=BLOCK_N, HEAD_DIM=HEAD_DIM_K,  
-        STAGE=stage,  
-        num_warps=4 if head_dim == 64 else 8,
-        num_stages=4)
+        HEAD_DIM=HEAD_DIM_K)
     return o
