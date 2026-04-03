@@ -1,6 +1,32 @@
 # CTD-modified-sageattention
 A SageAttention mod specifically for lower tier RDNA2 GPU's
 
+---
+
+## Changes — Extended Autotune Parameters (April 2026)
+
+Based on profiling results across seq_len [512–8192] and head_dim [64, 128] on AMD RX 6800 (gfx1030),
+the default config space was expanded to allow larger tile sizes that win at longer sequences.
+
+### `attn_qk_int8_per_block.py` (non-causal, autotuned)
+
+- `BLOCK_M` search range: `[32]` → `[32, 64]`
+- `BLOCK_N` search range: `[16]` → `[16, 32]`
+- `keep()` area ceiling: `> 1024` → `> 2048` (admits the new 64×32 tile)
+- Removed contradictory `num_warps` rules that would have filtered every area≥2048 config
+
+Autotune will now select from 32/16, 32/32, 64/16, and 64/32 at runtime per shape.
+
+### `attn_qk_int8_per_block_causal.py` (causal, hardcoded)
+
+- Fixed tile: `BLOCK_M 32 → 64`, `BLOCK_N` unchanged at 16
+
+**Rationale:** profiling showed `BM=64, BN=16` wins at seq≥1024 for hd=64 (e.g. 4.35 TFLOPS vs 0.69 at seq=1024),
+and `BM=64, BN=32` wins at seq=2048 hd=128. The previous `BM=32` was only optimal at seq=512/hd=128 where
+the regression is modest.
+
+---
+
 # SageAttention Config Profiler — AMD RX 6800 (gfx1030)
 
 **Device:** AMD Radeon RX 6800  

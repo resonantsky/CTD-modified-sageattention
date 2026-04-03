@@ -5,8 +5,8 @@ import triton.language as tl
 # Autotune Here
 configs = [
     triton.Config({'BLOCK_M': BM, 'BLOCK_N': BN, 'STAGE':S, 'waves_per_eu':wpe}, num_warps=nw, num_stages=ns) \
-    for BM in [32]\
-    for BN in [16]\
+    for BM in [32, 64]\
+    for BN in [16, 32]\
     for nw in[2, 4]\
     for ns in [1]\
     for S in [1]\
@@ -18,8 +18,8 @@ def keep(conf):
     BLOCK_N = conf.kwargs["BLOCK_N"]
     BLOCK_AREA = BLOCK_M * BLOCK_N
 
-    # do not keep too high block area, any higher doesnt seem to help for navi21
-    if (BLOCK_AREA > 1024):
+    # do not keep too high block area
+    if (BLOCK_AREA > 2048):
         return False
 
     # do not keep 'mirror image' configs (ie keep [64,32] and discard [32,64])
@@ -28,12 +28,6 @@ def keep(conf):
 
     # do not keep skinny sizes for now
     if (BLOCK_M//BLOCK_N >= 8):
-        return False
-    
-    # do not keep configs where num_warps is too high or low
-    if (BLOCK_AREA >= 1024 and conf.num_warps != 2):
-        return False
-    if (BLOCK_AREA >= 2048 and conf.num_warps != 4):
         return False
 
     return True
