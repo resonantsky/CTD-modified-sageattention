@@ -3,8 +3,7 @@ import triton
 import triton.language as tl
 
 configs_causal = [
-    triton.Config({'BLOCK_M': 32, 'BLOCK_N': BN, 'STAGE': 3, 'waves_per_eu': wpe}, num_warps=nw, num_stages=ns)
-    for BN  in [16, 32]
+    triton.Config({'BLOCK_M': 32, 'BLOCK_N': 16, 'STAGE': 3, 'waves_per_eu': wpe}, num_warps=nw, num_stages=ns)
     for nw  in [2, 4]
     for ns  in [2, 3]
     for wpe in [3, 4]

@@ -6,7 +6,7 @@ import triton.language as tl
 configs = [
     triton.Config({'BLOCK_M': BM, 'BLOCK_N': BN, 'STAGE':S, 'waves_per_eu':wpe}, num_warps=nw, num_stages=ns) \
     for BM in [32]\
-    for BN in [16, 32]\
+    for BN in [16]\
     for nw in[2, 4]\
     for ns in [2, 3]\
     for S in [1]\
