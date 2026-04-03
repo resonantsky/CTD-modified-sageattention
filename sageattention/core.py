@@ -184,7 +184,7 @@ def sageattn(
             _sage_log("sageattn", q, k, v, tensor_layout, is_causal, dtype, "INT8-h96 non-causal")
             return attn_h96_false(q_int8, k_int8, v, q_scale, k_scale, tensor_layout=tensor_layout, output_dtype=dtype)
 
-    q_int8, q_scale, k_int8, k_scale = per_block_int8(q, k, BLKQ=16, sm_scale=sm_scale, tensor_layout=tensor_layout)
+    q_int8, q_scale, k_int8, k_scale = per_block_int8(q, k, sm_scale=sm_scale, tensor_layout=tensor_layout)
 
     if is_causal:
         _sage_log("sageattn", q, k, v, tensor_layout, is_causal, dtype, "INT8 causal")
