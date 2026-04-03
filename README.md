@@ -31,10 +31,10 @@ Autotune will now select from 32/16, 32/32, 64/16, and 64/32 at runtime per shap
 - Autotuning kernel _attn_fwd with config BLOCK_M: 64, BLOCK_N: 32, STAGE: 1, waves_per_eu: 4, num_warps: 2, num_ctas: 1, num_stages: 1, maxnreg: None
 - Autotuning kernel _attn_fwd with config BLOCK_M: 64, BLOCK_N: 32, STAGE: 1, waves_per_eu: 3, num_warps: 4, num_ctas: 1, num_stages: 1, maxnreg: None
 - Autotuning kernel _attn_fwd with config BLOCK_M: 64, BLOCK_N: 32, STAGE: 1, waves_per_eu: 4, num_warps: 4, num_ctas: 1, num_stages: 1, maxnreg: None
--Triton autotuning for function _attn_fwd,
+- Triton autotuning for function _attn_fwd,
 with key as (6656, 6656, 'torch.int8', 'torch.int8', 'torch.float16', 'torch.float32', 'torch.float32', 'torch.float16'),
 finished after 28.81s,
-- best config selected: BLOCK_M: 64, BLOCK_N: 16, STAGE: 1, waves_per_eu: 4, num_warps: 4, num_ctas: 1, num_stages: 1, maxnreg: None;
+- Best config selected: BLOCK_M: 64, BLOCK_N: 16, STAGE: 1, waves_per_eu: 4, num_warps: 4, num_ctas: 1, num_stages: 1, maxnreg: None;
 
 ---
 
